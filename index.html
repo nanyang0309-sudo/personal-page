@@ -1,0 +1,491 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>南阳 | 个人主页</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+            color: #1e293b;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ===== Animated Background Canvas ===== */
+        #bgCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            display: block;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, rgba(30, 58, 95, 0.92) 0%, rgba(45, 90, 135, 0.88) 100%);
+            border-radius: 20px;
+            padding: 50px 40px;
+            text-align: center;
+            color: #fff;
+            margin-bottom: 32px;
+            box-shadow: 0 8px 32px rgba(30, 58, 95, 0.25);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .avatar {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+        }
+
+        .hero .subtitle {
+            font-size: 1rem;
+            opacity: 0.85;
+            font-weight: 400;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.90);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .section-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #1e3a5f;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(30, 58, 95, 0.12);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title .icon { font-size: 1.3rem; }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px 28px;
+        }
+
+        .info-item { display: flex; flex-direction: column; }
+
+        .info-item .label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+
+        .info-item .value {
+            font-size: 1rem;
+            color: #1e293b;
+            font-weight: 500;
+        }
+
+        .tags { display: flex; flex-wrap: wrap; gap: 10px; }
+
+        .tag {
+            background: rgba(30, 58, 95, 0.08);
+            color: #1e3a5f;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .contact-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 0;
+        }
+
+        .contact-row:not(:last-child) { border-bottom: 1px solid rgba(30, 58, 95, 0.08); }
+
+        .contact-row .contact-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(30, 58, 95, 0.08);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .contact-row .contact-text { font-size: 0.95rem; color: #334155; }
+        .contact-row .contact-label { font-size: 0.75rem; color: #94a3b8; }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+
+        .project-card {
+            display: flex;
+            flex-direction: column;
+            padding: 16px 20px;
+            border-radius: 12px;
+            background: rgba(30, 58, 95, 0.04);
+            border: 1px solid rgba(30, 58, 95, 0.08);
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .project-card:hover {
+            background: rgba(30, 58, 95, 0.07);
+            border-color: rgba(30, 58, 95, 0.15);
+        }
+
+        .project-card .project-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #1e3a5f;
+            margin-bottom: 4px;
+        }
+
+        .project-card .project-desc {
+            font-size: 0.85rem;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        .project-card .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .project-card .project-tags span {
+            font-size: 0.72rem;
+            padding: 2px 10px;
+            border-radius: 10px;
+            background: rgba(99, 102, 241, 0.1);
+            color: #4f46e5;
+            font-weight: 500;
+        }
+
+        .footer {
+            text-align: center;
+            color: rgba(148, 163, 184, 0.7);
+            font-size: 0.8rem;
+            padding: 20px 0 10px;
+        }
+
+        @media (max-width: 600px) {
+            .hero { padding: 36px 24px; }
+            .hero h1 { font-size: 1.6rem; }
+            .avatar { width: 110px; height: 110px; }
+            .section { padding: 24px 20px; }
+            .info-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bgCanvas"></canvas>
+
+    <div class="container">
+        <div class="hero">
+            <img src="photo.jpg" alt="南阳" class="avatar">
+            <h1>南 阳</h1>
+            <p class="subtitle">西安工业大学 · 机器人工程 · 大三</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="icon">📋</span> 个人信息</div>
+            <div class="info-grid">
+                <div class="info-item"><span class="label">姓名</span><span class="value">南阳</span></div>
+                <div class="info-item"><span class="label">出生日期</span><span class="value">2005.3.9</span></div>
+                <div class="info-item"><span class="label">星座</span><span class="value">双鱼座</span></div>
+                <div class="info-item"><span class="label">学校</span><span class="value">西安工业大学</span></div>
+                <div class="info-item"><span class="label">年级</span><span class="value">大三 · 本科</span></div>
+                <div class="info-item"><span class="label">专业</span><span class="value">机器人工程</span></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="icon">⚡</span> 技术兴趣</div>
+            <p style="color: #64748b; margin-bottom: 16px; font-size: 0.95rem;">
+                日常喜欢捣鼓软硬件结合的东西，热衷于把想法变成实物。
+            </p>
+            <div class="tags">
+                <span class="tag">🔧 单片机 (MCU)</span>
+                <span class="tag">📟 嵌入式系统</span>
+                <span class="tag">🌐 网络技术</span>
+                <span class="tag">🤖 机器人控制</span>
+                <span class="tag">⚙️ C / C++</span>
+                <span class="tag">📡 IoT 物联网</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="icon">💻</span> Keil 项目</div>
+            <p style="color: #64748b; margin-bottom: 18px; font-size: 0.9rem;">
+                基于 STM32 系列 MCU 的嵌入式项目，涵盖外设驱动、传感器、显示、游戏等。
+            </p>
+            <div class="project-grid">
+
+                <div class="project-card">
+                    <div class="project-name">STM32 工程模板</div>
+                    <div class="project-desc">基于 HAL 库的 STM32 开发基础工程模板，集成常用外设驱动初始化框架，作为后续项目的起点。</div>
+                    <div class="project-tags"><span>STM32</span><span>HAL库</span></div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-name">LED 闪烁 &amp; 流水灯</div>
+                    <div class="project-desc">GPIO 输出入门实验，包含单 LED 闪烁与多 LED 流水灯效果，掌握基本 IO 控制。</div>
+                    <div class="project-tags"><span>GPIO</span><span>LED</span></div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-name">蜂鸣器驱动</div>
+                    <div class="project-desc">PWM / 高低电平驱动蜂鸣器，实现不同频率的音调输出，学习定时器与 PWM 控制。</div>
+                    <div class="project-tags"><span>PWM</span><span>定时器</span></div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-name">按键控制 LED</div>
+                    <div class="project-desc">读取 GPIO 按键输入状态控制 LED 开关，涉及按键消抖、电平检测等基础交互逻辑。</div>
+                    <div class="project-tags"><span>GPIO</span><span>按键</span></div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-name">OLED 显示屏驱动</div>
+                    <div class="project-desc">I2C/SPI 驱动 0.96 寸 OLED 显示屏，实现字符、汉字和简单图形的显示，支持多模式切换。</div>
+                    <div class="project-tags"><span>I2C</span><span>OLED</span><span>显示</span></div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-name">PWM 呼吸灯</div>
+                    <div class="project-desc">利用定时器 PWM 输出控制 LED 渐亮渐灭，实现呼吸灯效果，理解占空比与亮度调节。</div>
+                    <div class="project-tags"><span>PWM</span><span>定时器</span><span>呼吸灯</span></div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-name">温度传感器 + LED 报警</div>
+                    <div class="project-desc">读取温度传感器（DS18B20 / NTC），超阈值时触发 LED 流水灯报警，软硬件联调。</div>
+                    <div class="project-tags"><span>DS18B20</span><span>传感器</span><span>报警</span></div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-name">温度传感器 + OLED 显示</div>
+                    <div class="project-desc">温度传感器采集数据，实时显示在 OLED 屏幕上，结合传感与显示。</div>
+                    <div class="project-tags"><span>传感器</span><span>OLED</span><span>数据采集</span></div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-name">月薪喵 — OLED GIF 播放器</div>
+                    <div class="project-desc">STM32F103C8T6 + 0.96 寸 OLED，播放"月薪喵" GIF 动画，解决 SRAM 溢出与重定义问题，高兼容性实现。</div>
+                    <div class="project-tags"><span>STM32F103</span><span>OLED</span><span>GIF</span></div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-name">月薪喵 — TFT 全彩版</div>
+                    <div class="project-desc">正点原子 Mini STM32 + 2.8 寸 TFT-LCD，全彩 GIF 播放，启用串口解决 LCD 初始化卡死问题。</div>
+                    <div class="project-tags"><span>STM32</span><span>TFT-LCD</span><span>全彩</span></div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-name">贪吃蛇游戏</div>
+                    <div class="project-desc">正点原子 Mini STM32 + 2.8 寸 TFT-LCD，全彩贪吃蛇游戏，使用外部面包板按键控制，移除了红外代码。</div>
+                    <div class="project-tags"><span>STM32</span><span>TFT-LCD</span><span>游戏</span></div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-name">USB 视频播放器</div>
+                    <div class="project-desc">正点原子 Mini STM32 + 2.8 寸 TFT-LCD，USB 虚拟串口传输视频数据，单缓冲优化解决 SRAM 溢出，极速渲染。</div>
+                    <div class="project-tags"><span>STM32</span><span>USB</span><span>视频</span></div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="icon">📬</span> 联系方式</div>
+            <div class="contact-row">
+                <div class="contact-icon">📞</div>
+                <div><div class="contact-label">电话</div><div class="contact-text">13022813906</div></div>
+            </div>
+            <div class="contact-row">
+                <div class="contact-icon">📍</div>
+                <div><div class="contact-label">所在城市</div><div class="contact-text">陕西 · 西安</div></div>
+            </div>
+        </div>
+
+        <div class="footer">&copy; 2026 南阳 &mdash; Personal Page</div>
+    </div>
+
+    <script>
+        // === Animated Background Canvas ===
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+        let w, h, particles = [], time = 0;
+
+        function resize() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // --- Particles (floating energy orbs) ---
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * w;
+                this.y = Math.random() * h;
+                this.r = Math.random() * 2.5 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.speedY = (Math.random() - 0.5) * 0.4;
+                this.alpha = Math.random() * 0.5 + 0.15;
+                this.alphaSpeed = (Math.random() - 0.5) * 0.005;
+                this.color = Math.random() > 0.5 ?
+                    [99, 102, 241] :  // indigo
+                    [168, 85, 247];    // purple
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.alpha += this.alphaSpeed;
+                if (this.alpha > 0.6 || this.alpha < 0.08) this.alphaSpeed *= -1;
+                if (this.x < -10 || this.x > w + 10 || this.y < -10 || this.y > h + 10) this.reset();
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${this.color[0]},${this.color[1]},${this.color[2]},${this.alpha})`;
+                ctx.fill();
+            }
+        }
+
+        const particleCount = Math.min(80, Math.floor(w * h / 20000));
+        for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+
+        // --- Aurora / wave effect ---
+        let wavePhase = 0;
+        const waveColors = [
+            [30, 58, 95, 0.06],
+            [45, 90, 135, 0.05],
+            [99, 102, 241, 0.04],
+            [168, 85, 247, 0.03],
+        ];
+
+        function drawWaves() {
+            wavePhase += 0.003;
+            const count = 3;
+            for (let wIdx = 0; wIdx < count; wIdx++) {
+                const offset = wIdx * 0.7 + wavePhase;
+                const c = waveColors[wIdx % waveColors.length];
+                ctx.beginPath();
+                ctx.moveTo(0, h);
+                for (let x = 0; x <= w; x += 3) {
+                    const y = h * 0.35
+                        + Math.sin(x * 0.002 + offset) * h * 0.12
+                        + Math.sin(x * 0.005 + offset * 0.7) * h * 0.06
+                        + Math.sin(x * 0.008 + offset * 0.4) * h * 0.04;
+                    ctx.lineTo(x, y);
+                }
+                ctx.lineTo(w, h);
+                ctx.closePath();
+                ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${c[3]})`;
+                ctx.fill();
+            }
+        }
+
+        // --- Connecting lines between nearby particles ---
+        function drawConnections() {
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 100) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(99, 102, 241, ${0.06 * (1 - dist / 100)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        // --- Main render loop ---
+        function render() {
+            // Background gradient
+            const grad = ctx.createRadialGradient(w * 0.5, h * 0.4, 0, w * 0.5, h * 0.4, w * 0.8);
+            grad.addColorStop(0, '#1a1a3e');
+            grad.addColorStop(0.5, '#12122a');
+            grad.addColorStop(1, '#0a0a18');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            // Glowing orbs
+            const orbPositions = [
+                [w * 0.15, h * 0.25, 300],
+                [w * 0.85, h * 0.65, 250],
+                [w * 0.5, h * 0.85, 200],
+            ];
+            for (const [ox, oy, radius] of orbPositions) {
+                const grd = ctx.createRadialGradient(ox, oy, 0, ox, oy, radius);
+                grd.addColorStop(0, 'rgba(99, 102, 241, 0.04)');
+                grd.addColorStop(0.5, 'rgba(30, 58, 95, 0.03)');
+                grd.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = grd;
+                ctx.fillRect(ox - radius, oy - radius, radius * 2, radius * 2);
+            }
+
+            // Waves
+            drawWaves();
+
+            // Connections
+            drawConnections();
+
+            // Particles
+            for (const p of particles) {
+                p.update();
+                p.draw();
+            }
+
+            requestAnimationFrame(render);
+        }
+
+        render();
+    </script>
+</body>
+</html>
